@@ -20,7 +20,7 @@ def default_parameter_setting_load():
     build_mode = "Default"
     # A4 规格
     # 单位: cm
-    page_resolution = tuple((21., 29.7))
+    page_resolution = tuple((21, 29.7))
 
     # # 常规页边距
     # margins = tuple((2.54, 2.8))
@@ -29,7 +29,7 @@ def default_parameter_setting_load():
     margins = tuple((0, 0))
 
     # 居中 + 自适应缩放模式
-    scale_mode = 1
+    scale_mode = "Default"
     # 默认为启动目录
     tmp_file_path = "./tmp"
     # 默认为启动目录
@@ -79,39 +79,48 @@ def Init():
 def start_process():
     global page_resolution, margins
 
-    zoom: int = 5
-    basic_page_resolution = tuple((int(page_resolution[0]), int(page_resolution[1])))
-    rotate_page_resolution = tuple((int(page_resolution[1]), int(page_resolution[0])))
-    fix_page_resolution = tuple((int(page_resolution[1] / 2), int(page_resolution[0])))
-    margins = tuple((int(margins[0]), int(margins[1])))
+    zoom: int = 1
+    zoom_extract: int = 150 * zoom
+    zoom_output: int = 250 * zoom
 
-    process.extract_picture(File, basic_page_resolution, tmp_file_path, zoom= zoom)
+    basic_page_resolution = tuple((page_resolution[0] / 10, page_resolution[1] / 10))
+    rotate_page_resolution = tuple((page_resolution[1] / 10, page_resolution[0] / 10))
+    fix_page_resolution = tuple((page_resolution[1] / 2 / 10, page_resolution[0] / 10))
+    margins = tuple((margins[0] / 10, margins[1] / 10))
+
+    # process.extract_picture(File, basic_page_resolution, tmp_file_path, zoom=zoom_extract)
+
 
     new_doc = process.new_file_make(rotate_page_resolution)
     new_doc: fitz.Document
 
     index = process.page_sort(build_mode, File.page_count)
 
+    File.close()
+
     for i in range(index.__len__()):
-        new_doc._newPage(width=rotate_page_resolution[0] * zoom, height=rotate_page_resolution[1] * zoom)
-        new_doc._newPage(width=rotate_page_resolution[0] * zoom, height=rotate_page_resolution[1] * zoom)
+        new_doc._newPage(width=rotate_page_resolution[0] * zoom_output, height=rotate_page_resolution[1] * zoom_output)
 
-        process.page_make(new_doc[int(i / 4)], f"{tmp_file_path}/{index[i][0]}.png",
-                          fix_page_resolution, margins, scale_mode, zoom=zoom)
+        process.page_make(new_doc[int(i * 2)], f"{tmp_file_path}/{index[i][0]}.png",
+                          fix_page_resolution, margins, scale_mode, zoom=zoom_output)
 
-        process.page_make(new_doc[int(i / 4)], f"{tmp_file_path}/{index[i][1]}.png",
-                          (fix_page_resolution[0], fix_page_resolution[1]),
-                          margins, scale_mode, zoom=zoom, rel_pos=(rotate_page_resolution[0] / 2, 0))
+        process.page_make(new_doc[int(i * 2)], f"{tmp_file_path}/{index[i][1]}.png",
+                          fix_page_resolution,
+                          margins, scale_mode, zoom=zoom_output, rel_pos=(rotate_page_resolution[0] / 2, 0))
 
-        process.page_make(new_doc[int(i / 4 + 1)], f"{tmp_file_path}/{index[i][2]}.png",
-                          (fix_page_resolution[0], fix_page_resolution[1]),
-                          margins, scale_mode, zoom=zoom)
+        new_doc._newPage(width=rotate_page_resolution[0] * zoom_output, height=rotate_page_resolution[1] * zoom_output)
 
-        process.page_make(new_doc[int(i / 4 + 1)], f"{tmp_file_path}/{index[i][3]}.png",
-                          (fix_page_resolution[0], fix_page_resolution[1]),
-                          margins, scale_mode, zoom=zoom, rel_pos=(rotate_page_resolution[0] / 2, 0))
+        process.page_make(new_doc[int(i * 2 + 1)], f"{tmp_file_path}/{index[i][2]}.png",
+                          fix_page_resolution,
+                          margins, scale_mode, zoom=zoom_output)
+
+        process.page_make(new_doc[int(i * 2 + 1)], f"{tmp_file_path}/{index[i][3]}.png",
+                          fix_page_resolution,
+                          margins, scale_mode, zoom=zoom_output, rel_pos=(rotate_page_resolution[0] / 2, 0))
 
     new_doc.save(output_file_path)
+
+    new_doc.close()
 
 
 Init()

@@ -2,24 +2,23 @@
 
 import fitz
 import os
-import PIL
 
 
-def extract_picture(doc: fitz.Document, scale: tuple[int, int], save_path: str, zoom: int = 1):
+def extract_picture(doc: fitz.Document, scale: tuple[float, float], save_path: str, zoom: int = 1):
     total = doc.page_count
 
     for pg in range(total):
         page = doc[pg]
-        zoom = int(zoom)  # 值越大，分辨率越高，文件越清晰
         rotate = int(0)
 
         rect = page.rect  # 页面大小
         mp = rect.tl  # 矩形区域
         clip = fitz.Rect(mp, rect.br)
 
-        trans = fitz.Matrix(int((zoom * scale[0]) / 200), int((zoom * scale[1]) / 200)).prerotate(rotate)
 
-        pm = page.get_pixmap(matrix=trans, alpha=False, clip=clip)
+        # pm = page.get_pixmap(matrix=trans, clip=clip)
+
+        pm = page.get_pixmap(clip=clip, dpi=zoom)
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
@@ -41,10 +40,10 @@ def adaptive_scaling_size_make(picture_size: tuple[float, float], cut_size: tupl
         put_size = tuple((picture_size[0] - cut_size[0] * 2, picture_size[1] - cut_size[1] * 2))
     if put_size[0] / put_size[1] > picture_size[0] / picture_size[1]:
         # 长边太长了
-        return tuple((put_size[0], int(picture_size[1] * picture_size[0] / put_size[0])))
+        return tuple((put_size[0], picture_size[1] * picture_size[0] / put_size[0]))
     if put_size[0] / put_size[1] < picture_size[0] / picture_size[1]:
         # 短边太长了
-        return tuple((int(put_size[0] * put_size[1] / put_size[1]), picture_size[1]))
+        return tuple((put_size[0] * put_size[1] / put_size[1], picture_size[1]))
     if put_size[0] / put_size[1] == picture_size[0] / picture_size[1]:
         # 比例恰好合适
         return tuple((picture_size[0] - cut_size[0] * 2, picture_size[1] - cut_size[1] * 2))
@@ -65,7 +64,7 @@ def page_make(page: fitz.Page, image_file_path: str,
     :return: None
     """
 
-    if image_file_path[-6:-5] == -1:
+    if image_file_path[-6:-4] == '-1':
         return
 
     picture_size: tuple[float, float]
@@ -75,20 +74,26 @@ def page_make(page: fitz.Page, image_file_path: str,
         case 0:
             # 居中 + 自适应缩放
             picture_size = adaptive_scaling_size_make(resolution, margin)
-            picture_pos = tuple(
-                (int((resolution[0] - picture_size[0]) / 2), int((resolution[1] - picture_size[1]) / 2)))
+            picture_pos = tuple(((resolution[0] - picture_size[0]) / 2, (resolution[1] - picture_size[1]) / 2))
         case _:
             # 强制缩放
-            picture_size = adaptive_scaling_size_make(resolution, margin)
+            picture_size = resolution
             picture_pos = margin
 
-    picture_pos = tuple((picture_pos[0] + rel_pos[0], picture_pos[1] + rel_pos[1]))
-    picture_size = tuple((picture_size[0] + rel_pos[0], picture_size[1] + rel_pos[1]))
+    # picture_pos = tuple((picture_pos[0] + rel_pos[0], picture_pos[1] + rel_pos[1]))
+    # picture_size = tuple((picture_size[0] + rel_pos[0], picture_size[1] + rel_pos[1]))
+
+    # 0, 0
+    # 1.48......
 
     picture_pos = tuple(int(i) for i in picture_pos)
     picture_size = tuple(int(i) for i in picture_size)
 
     rect = fitz.Rect(picture_pos[0] * zoom, picture_pos[1] * zoom, picture_size[0] * zoom, picture_size[1] * zoom)
+
+    rect[0] += rel_pos[0] * zoom
+    rect[2] += rel_pos[0] * zoom
+
     page.insert_image(rect, filename=image_file_path)
 
 
@@ -112,18 +117,18 @@ def page_sort(sort_mode: str, page_range: int) -> tuple[tuple[int, int, int, int
                 result[i] = tuple(result[i])
 
     if page_range % 4:
-        i = page_range % 4 + 1
-        result[i] = [i * 4 for _ in range(4)]
+        i = int( page_range / 4 )
+        result.append([i * 4 for _ in range(4)])
         match sort_mode:
-            case _, 3:
-                result[i][0] += 4
-                result[i][1] = result[i][1] + 1 if i * 4 - 4 + 2 < page_range else -1
-                result[i][2] = result[i][2] + 2 if i * 4 - 4 + 3 < page_range else -1
-                result[i][3] = -1
+            case _:
+                result[i][0] = result[i][0] + 4 if i * 4 + 3 < page_range else -1
+                result[i][1] = result[i][1] + 1 if i * 4 + 0 < page_range else -1
+                result[i][2] = result[i][2] + 2 if i * 4 + 1 < page_range else -1
+                result[i][3] = result[i][3] + 3 if i * 4 + 2 < page_range else -1
 
     return tuple(result)
 
 
-def new_file_make(resolution: tuple[int, int]):
+def new_file_make(resolution: tuple[float, float]):
     return fitz.Document()
 

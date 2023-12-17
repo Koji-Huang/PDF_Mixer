@@ -1,5 +1,6 @@
-import os.path
+# encoding=utf-8
 
+import os.path
 import fitz
 
 
@@ -36,7 +37,7 @@ def init_input_file() -> fitz.Document:
 
 
 def init_rebuild_mode() -> str:
-    # ·ÖÒ³¹æÂÉ
+    # åˆ†é¡µè§„å¾‹
     mode_collection = ("One_Direction", "Different_Direction", "Default", "0", "1")
     print("")
     print("Rebuild Mod")
@@ -51,18 +52,18 @@ def init_rebuild_mode() -> str:
 
 
 def init_page_resolution() -> tuple[int, int]:
-    # Ã¿Ò³ PDF µÄ·Ö±æÂÊ
+    # æ¯é¡µ PDF çš„åˆ†è¾¨ç‡
     print("\n")
     print("Big Page page_resolution")
-    # ×İÏò A4
+    # çºµå‘ A4
     print("1 for A4 (Vertical)")
-    # ºáÏò A4
+    # æ¨ªå‘ A4
     print("2 for A4 (horizontal)")
-    # ×İÏò A5
+    # çºµå‘ A5
     print("3 for A5 (Vertical)")
-    # ºáÏò A5
+    # æ¨ªå‘ A5
     print("4 for A5 (horizontal)")
-    # ×Ô¶¨Òå·Ö±æÂÊ
+    # è‡ªå®šä¹‰åˆ†è¾¨ç‡
     print("Other for Custom Setting")
 
     match int(input(">>> ")):
@@ -96,7 +97,7 @@ def init_page_resolution() -> tuple[int, int]:
 
 
 def init_margins() -> tuple[int, int]:
-    # Ò³±ß¾à
+    # é¡µè¾¹è·
     print("\n")
     print("Page Margins")
     print("0 for No margins")
@@ -136,20 +137,20 @@ def init_margins() -> tuple[int, int]:
 
 
 def init_scale_mode() -> int:
-    # Ëõ·ÅÄ£Ê½
+    # ç¼©æ”¾æ¨¡å¼
     print("\n")
     print("Scale Mode")
-    # Ç¿ÖÆËõ·Å
+    # å¼ºåˆ¶ç¼©æ”¾
     print("0 for Force Zoom")
-    # ¾ÓÖĞ + ×ÔÊÊÓ¦
+    # å±…ä¸­ + è‡ªé€‚åº”
     print("1 for Keep to theCentered and Adaptive scaling")
-    # ¿¿ÓÒ + ×ÔÊÊÓ¦
+    # é å³ + è‡ªé€‚åº”
     print("2 for Keep to the Right and Adaptive scaling")
-    # ¿¿×ó + ×ÔÊÊÓ¦
+    # é å·¦ + è‡ªé€‚åº”
     print("3 for Keep to the Left and Adaptive scaling")
-    # ¿¿ÉÏ + ×ÔÊÊÓ¦
+    # é ä¸Š + è‡ªé€‚åº”
     print("4 for Keep to the Top and Adaptive scaling")
-    # ¿¿ÏÂ + ×ÔÊÊÓ¦
+    # é ä¸‹ + è‡ªé€‚åº”
     print("5 for Keep to the Button and Adaptive scaling")
     while True:
         try:
@@ -164,7 +165,7 @@ def init_scale_mode() -> int:
 
 
 def init_tmp_folder() -> str:
-    # ÁÙÊ±ÎÄ¼ş´æ·Å´¦
+    # ä¸´æ—¶æ–‡ä»¶å­˜æ”¾å¤„
     print("\n")
     print("TMP file folder:")
     print("No Input will put on ./")
@@ -176,7 +177,7 @@ def init_tmp_folder() -> str:
 
 
 def init_output_path() -> str:
-    # Êä³öÎÄ¼şÂ·¾¶
+    # è¾“å‡ºæ–‡ä»¶è·¯å¾„
     print("\n")
     print("Output file folder")
     print("No Input will put on ./")

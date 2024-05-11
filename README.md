@@ -10,7 +10,7 @@
 
 ​	这里贴张图来说明工作原理
 
-<img src=".\对比.png" alt="对比.png" style="zoom:50%;" />
+<img src=".\对比.png" alt="https://github.com/Koji-Huang/PDF_Mixer/blob/master/%E5%AF%B9%E6%AF%94.png" style="zoom:50%;" />
 
 ​	它可以将两页的数据压缩至一页(节约用纸嘛), 对于缺纸或者希望节约点打印费的人来说非常实用(不过打印完的需要对折, 你可以自己更改 page_sort 函数来实现不同的排列方式, 比如直接叠加或者隔几页纸可以叠加的版本), 我之前预留有这个想法但是懒得开发了, GUI 也懒得搞 (我社团的人说不需要, 未来看我什么时候想加就加吧)
 
@@ -235,4 +235,4 @@
 
 ​	欢迎大家使用或者重构这个项目, 如果对你有帮助的话可以V我50喵, 孩子想买哈迪斯惹o((>ω< ))o, 谢谢支持~
 
-<img src="./zfb.jpg" style="zoom:25%;" />
+<img src="https://github.com/Koji-Huang/PDF_Mixer/blob/master/zfb.jpg" style="zoom:25%;" />

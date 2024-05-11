@@ -7,16 +7,20 @@ import os
 def extract_picture(doc: fitz.Document, scale: tuple[float, float], save_path: str, zoom: int = 1):
     total = doc.page_count
 
+    print("")
+    print("--------------------------------")
+    print("")
     for pg in range(total):
+        percent = int(pg * 100 / total)
+
+        print("\r", end='')
+        print("Extracting Picture: {}%: ".format(percent), "▋" * (percent // 2), 'page: %d - %d' % (pg, total), end="")
+
         page = doc[pg]
-        rotate = int(0)
 
         rect = page.rect  # 页面大小
         mp = rect.tl  # 矩形区域
         clip = fitz.Rect(mp, rect.br)
-
-
-        # pm = page.get_pixmap(matrix=trans, clip=clip)
 
         pm = page.get_pixmap(clip=clip, dpi=zoom)
 
@@ -24,6 +28,12 @@ def extract_picture(doc: fitz.Document, scale: tuple[float, float], save_path: s
             os.mkdir(save_path)
         save = os.path.join(save_path, '%s.png' % (pg + 1))
         pm.save(save)
+
+    print("")
+    print("Extract Picture Finished")
+    print("")
+    print("--------------------------------")
+
     return
 
 
@@ -72,13 +82,13 @@ def page_make(page: fitz.Page, image_file_path: str,
 
     match scale_mode:
         case 0:
-            # 居中 + 自适应缩放
-            picture_size = adaptive_scaling_size_make(resolution, margin)
-            picture_pos = tuple(((resolution[0] - picture_size[0]) / 2, (resolution[1] - picture_size[1]) / 2))
-        case _:
             # 强制缩放
             picture_size = resolution
             picture_pos = margin
+        case _:
+            # 居中 + 自适应缩放
+            picture_size = adaptive_scaling_size_make(resolution, margin)
+            picture_pos = tuple(((resolution[0] - picture_size[0]) / 2, (resolution[1] - picture_size[1]) / 2))
 
     # picture_pos = tuple((picture_pos[0] + rel_pos[0], picture_pos[1] + rel_pos[1]))
     # picture_size = tuple((picture_size[0] + rel_pos[0], picture_size[1] + rel_pos[1]))
@@ -86,10 +96,10 @@ def page_make(page: fitz.Page, image_file_path: str,
     # 0, 0
     # 1.48......
 
-    picture_pos = tuple(int(i) for i in picture_pos)
-    picture_size = tuple(int(i) for i in picture_size)
+    picture_pos = tuple(int(i * zoom) for i in picture_pos)
+    picture_size = tuple(int(i * zoom) for i in picture_size)
 
-    rect = fitz.Rect(picture_pos[0] * zoom, picture_pos[1] * zoom, picture_size[0] * zoom, picture_size[1] * zoom)
+    rect = fitz.Rect(picture_pos, picture_size)
 
     rect[0] += rel_pos[0] * zoom
     rect[2] += rel_pos[0] * zoom
